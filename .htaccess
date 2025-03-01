@@ -11,3 +11,10 @@ RewriteRule ^listeEtudiants$ view/pages/admin/listeEtudiants/liste.php
 RewriteRule ^listeEvaluations$ view/pages/admin/listeEvaluations/liste.php
 RewriteRule ^listeNotes$ view/pages/admin/listeNotes/liste.php
 RewriteRule ^gestionUtilisateurs$ view/pages/admin/gestionUtilisateurs/liste.php
+
+
+#----------- Route Controller -----------
+RewriteRule ^userMainController$  controller/user/UserMainController.php
+
+#----------- Route Model -----------
+RewriteRule ^UserRepository$  model/UserRepository.php
