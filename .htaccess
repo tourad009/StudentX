@@ -4,3 +4,9 @@ RewriteEngine On
 RewriteRule ^login$ login.php
 RewriteRule ^admin$ admin.php
 RewriteRule ^home$ index.php
+
+#----------- Route Controller -----------
+RewriteRule ^userMainController$  controller/user/UserMainController.php
+
+#----------- Route Model -----------
+RewriteRule ^UserRepository$  model/UserRepository.php
