@@ -4,3 +4,10 @@ RewriteEngine On
 RewriteRule ^login$ login.php
 RewriteRule ^admin$ admin.php
 RewriteRule ^home$ index.php
+
+
+#----------- Route View -----------
+RewriteRule ^listeEtudiants$ view/pages/admin/listeEtudiants/liste.php
+RewriteRule ^listeEvaluations$ view/pages/admin/listeEvaluations/liste.php
+RewriteRule ^listeNotes$ view/pages/admin/listeNotes/liste.php
+RewriteRule ^gestionUtilisateurs$ view/pages/admin/gestionUtilisateurs/liste.php
