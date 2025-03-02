@@ -1,71 +1,36 @@
-// Séléctionner les champs du formulaire
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
-const btnSubmit = document.getElementById("btnSubmit");
+$(document).ready(function () {
+  $("#loginForm").on("submit", function (e) {
+    e.preventDefault();
 
-// Désactiver le bouton de soumission par defaut
-btnSubmit.disabled = true;
+    $.ajax({
+      url: "index.php?page=login",
+      type: "POST",
+      data: $(this).serialize(),
+      dataType: "json",
+      success: function (response) {
+        if (response.success) {
+          // Afficher le message de succès
+          $("#successMessage")
+            .show()
+            .text("Connexion réussie ! Redirection...");
 
-//Permet d'afficher ou masquer les message d'erreur
-function showError(input, message)
-{
-    const baliseP = input.nextElementSibling;
-    if (message) {
-        baliseP.textContent = message;
-        input.classList.add("is-invalid");
-    }
-    else
-    {
-        baliseP.textContent = "";
-        input.classList.remove("is-invalid");
-    }
-}
-
-// Validation de l'email à la saisie
-emailInput.addEventListener("input", () => {
-    const email = emailInput.value.trim();
-    const emailValidator = Validator.emailValidator("L'email", email);
-
-    if (emailValidator) {
-        showError(emailInput, emailValidator.message);
-        checkFormValidaty();
-    }
-    else
-    {
-        showError(emailInput, "");
-        checkFormValidaty();
-    }
+          // Redirection vers la page admin
+          setTimeout(function () {
+            window.location.href = "index.php?page=admin";
+          }, 1000);
+        } else {
+          // Afficher le message d'erreur
+          $("#errorMessage")
+            .show()
+            .text(response.message || "Identifiants incorrects");
+        }
+      },
+      error: function (xhr, status, error) {
+        console.error("Erreur AJAX:", error);
+        $("#errorMessage")
+          .show()
+          .text("Une erreur est survenue lors de la connexion");
+      },
+    });
+  });
 });
-
-// Validation du password à la saisie
-passwordInput.addEventListener("input", () => {
-    const password = passwordInput.value.trim();
-    const passwordValidator = Validator.passwordValidator("Le mot de passe", password, 8);
-    if (passwordValidator) {
-        showError(passwordInput, passwordValidator.message);
-        checkFormValidaty();
-    }
-    else
-    {
-        showError(passwordInput, "");
-        checkFormValidaty();
-    }
-});
-
-//Active le bouton de connexion si les deux champs sont valides
-function checkFormValidaty()
-{
-    const email = emailInput.value.trim();
-    const password = passwordInput.value.trim();
-
-    const emailValidator = Validator.emailValidator("L'email", email);
-    const passwordValidator = Validator.passwordValidator("Le mot de passe", password, 8);
-
-    if (!emailValidator && !passwordValidator) {
-        btnSubmit.disabled = false;
-    }
-    else
-    {
-        btnSubmit.disabled = true;
-    }
-}

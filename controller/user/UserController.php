@@ -94,9 +94,6 @@ class UserController
             $email = $_POST['email'];
             $password = $_POST['password'];
 
-            // Journalisation pour le débogage
-            error_log("Tentative de connexion avec email: $email");
-
             try {
                 // Créer une instance de UserRepository
                 $userRepo = new UserRepository();
@@ -108,36 +105,27 @@ class UserController
                     // Connexion réussie
                     error_log("Connexion réussie pour l'utilisateur: " . $user['email']);
                     
-                    // Définir les variables de session de manière simplifiée
+                    // Définir les variables de session
                     $_SESSION['user_id'] = $user['id'];
                     $_SESSION['user_role'] = $user['role'];
                     $_SESSION['nom'] = $user['nom'];
                     $_SESSION['email'] = $user['email'];
                     
-                    // Redirection simplifiée - toujours vers la liste des utilisateurs
-                    header("Location: gestionUtilisateurs");
+                    // Redirection vers admin au lieu de gestionUtilisateurs
+                    header("Location: admin");
                     exit;
                 } else {
-                    // Échec de la connexion - mais on va quand même rediriger vers la liste pour tester
-                    error_log("Échec de la connexion pour l'email: $email - mais on continue quand même");
-                    
-                    // Pour le test, on définit une session minimale
-                    $_SESSION['user_id'] = 1; // ID temporaire
-                    $_SESSION['user_role'] = 'Admin'; // Rôle temporaire
-                    
-                    header("Location: gestionUtilisateurs");
+                    // Échec de la connexion
+                    error_log("Échec de la connexion pour l'email: $email");
+                    header("Location: login?error=1&message=" . urlencode("Identifiants incorrects"));
                     exit;
                 }
             } catch (Exception $e) {
-                // Journaliser l'erreur
                 error_log("Erreur lors de l'authentification: " . $e->getMessage());
-                
-                // Rediriger vers la page de connexion avec un message d'erreur
                 header("Location: login?error=1&message=" . urlencode("Erreur lors de la connexion: " . $e->getMessage()));
                 exit;
             }
         } else {
-            // Données du formulaire manquantes
             header("Location: login?error=1&message=" . urlencode("Veuillez fournir un email et un mot de passe."));
             exit;
         }
