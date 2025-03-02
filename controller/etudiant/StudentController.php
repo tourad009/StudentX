@@ -1,5 +1,5 @@
 <?php
-require_once "../../model/StudentRepository.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/StudentX/model/StudentRepository.php";
 
 class StudentController {
     private $repository;
@@ -9,11 +9,21 @@ class StudentController {
     }
 
     public function listStudents() {
-        return $this->repository->getAllStudents();
+        try {
+            return $this->repository->getAllStudents();
+        } catch (Exception $e) {
+            error_log("Erreur lors de la récupération des étudiants: " . $e->getMessage());
+            return [];
+        }
     }
 
     public function getStudentById($id) {
-        return $this->repository->getStudentById($id);
+        try {
+            return $this->repository->getStudentById($id);
+        } catch (Exception $e) {
+            error_log("Erreur lors de la récupération de l'étudiant: " . $e->getMessage());
+            return null;
+        }
     }
 
     public function addStudent($nom, $email, $password, $matricule, $tel, $adresse) {

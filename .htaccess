@@ -16,11 +16,13 @@ RewriteRule ^gestionMDP$ view/pages/admin/gestionMDP/liste.php
 RewriteRule ^UserMainController$ controller/user/UserMainController.php [L]
 RewriteRule ^EtudiantMainController$ controller/etudiant/StudentMainController.php 
 RewriteRule ^NoteMainController$ controller/note/NoteMainController.php 
+RewriteRule ^EvaluationMainController$ controller/evaluation/EvaluationMainController.php [L]
 
 #----------- Route Model ----------- 
 RewriteRule ^UserRepository$ model/UserRepository.php 
 RewriteRule ^NoteRepository$ model/NoteRepository.php 
 RewriteRule ^StudentRepository$ model/StudentRepository.php
+RewriteRule ^EvaluationRepository$ model/EvaluationRepository.php [L]
 
 # ------------ Gestion des actions ---------------- 
 RewriteCond %{QUERY_STRING} (^|&)action=([^&]+)(&|$) 

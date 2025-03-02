@@ -100,7 +100,16 @@ if (isset($_GET['action'])) {
         }
         
         // Mettre à jour les informations générales de l'utilisateur
-        $userRepository->editUser($id, $nom, $prenom, $email, $password);
+        $userRepository->editUser(
+            $id,
+            $nom,
+            $prenom,
+            $email,
+            $password,
+            $_POST['matricule'] ?? null,
+            $_POST['tel'] ?? null,
+            $_POST['adresse'] ?? null
+        );
 
         // Si l'utilisateur est un étudiant, mettre à jour les informations spécifiques
         if ($user['role'] == 'Etudiant') {

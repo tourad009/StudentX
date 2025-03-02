@@ -242,33 +242,61 @@ class UserRepository extends DBRepository
     }
 
     // Éditer un utilisateur
-    public function editUser($id, $nom, $prenom, $email, $password = null) {
+    public function editUser($id, $nom, $prenom, $email, $password = null, $matricule = null, $tel = null, $adresse = null) {
         try {
-            // Utiliser directement user_id comme nom de colonne pour l'identifiant
-            $query = "UPDATE users SET nom = :nom, prenom = :prenom, email = :email, updated_at = NOW()";
-    
-            if ($password !== null) {
-                $query .= ", password = :password";
+            $this->db->beginTransaction();
+
+            // 1. Mise à jour de la table users
+            if ($password) {
+                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+                $sql = "UPDATE users 
+                        SET nom = :nom, 
+                            prenom = :prenom, 
+                            email = :email, 
+                            password = :password 
+                        WHERE user_id = :id";
+                
+                $stmt = $this->db->prepare($sql);
+                $stmt->bindParam(':password', $hashedPassword);
+            } else {
+                $sql = "UPDATE users 
+                        SET nom = :nom, 
+                            prenom = :prenom, 
+                            email = :email 
+                        WHERE user_id = :id";
+                
+                $stmt = $this->db->prepare($sql);
             }
-    
-            $query .= " WHERE user_id = :id";
-    
-            $stmt = $this->db->prepare($query);
-    
-            $stmt->bindParam(':id', $id);
+
             $stmt->bindParam(':nom', $nom);
             $stmt->bindParam(':prenom', $prenom);
             $stmt->bindParam(':email', $email);
-    
-            if ($password !== null) {
-                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-                $stmt->bindParam(':password', $hashedPassword);
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+
+            // 2. Mise à jour de la table etudiants si l'utilisateur est un étudiant
+            if ($matricule !== null || $tel !== null || $adresse !== null) {
+                $sql = "UPDATE etudiants 
+                        SET matricule = :matricule,
+                            tel = :tel,
+                            adresse = :adresse,
+                            updated_at = CURRENT_TIMESTAMP
+                        WHERE user_id = :user_id";
+                
+                $stmt = $this->db->prepare($sql);
+                $stmt->bindParam(':matricule', $matricule);
+                $stmt->bindParam(':tel', $tel);
+                $stmt->bindParam(':adresse', $adresse);
+                $stmt->bindParam(':user_id', $id);
+                $stmt->execute();
             }
-    
-            // Exécution de la requête
-            return $stmt->execute();
+
+            $this->db->commit();
+            return true;
+
         } catch (PDOException $e) {
-            error_log("Erreur lors de la modification de l'utilisateur: " . $e->getMessage());
+            $this->db->rollBack();
+            error_log("Erreur lors de la modification de l'utilisateur : " . $e->getMessage());
             throw $e;
         }
     }

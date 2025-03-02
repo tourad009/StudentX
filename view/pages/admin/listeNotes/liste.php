@@ -1,5 +1,16 @@
+<?php
+session_start(); // Démarrer la session avant toute sortie HTML
+require_once $_SERVER['DOCUMENT_ROOT'] . "/StudentX/controller/note/NoteController.php";
+
+try {
+    $controller = new NoteController();
+    $notes = $controller->getAllNotes();
+} catch (Exception $e) {
+    $_SESSION['error_message'] = "Erreur lors de la récupération des notes.";
+}
+?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
   <!-- Section Head -->
   <?php require_once("../../../sections/admin/head.php") ?>
 
@@ -19,6 +30,21 @@
             <ol class="breadcrumb mb-4">
               <li class="breadcrumb-item active">Gestion des notes</li>
             </ol>
+
+            <!-- Affichage des messages de succès ou d'erreur -->
+            <?php if (isset($_SESSION['success_message'])): ?>
+                <div class="alert alert-success">
+                    <?= htmlspecialchars($_SESSION['success_message']) ?>
+                </div>
+                <?php unset($_SESSION['success_message']); ?>
+            <?php endif; ?>
+
+            <?php if (isset($_SESSION['error_message'])): ?>
+                <div class="alert alert-danger">
+                    <?= htmlspecialchars($_SESSION['error_message']) ?>
+                </div>
+                <?php unset($_SESSION['error_message']); ?>
+            <?php endif; ?>
 
             <!-- Table des Notes -->
             <div class="card mb-4">
@@ -45,24 +71,35 @@
                     </tr>
                   </thead>
                   <tbody id="notesTableBody">
-                    <tr>
-                      <td>ETU001</td>
-                      <td>Évaluation sur les réseaux</td>
-                      <td>15</td>
-                      <td>
-                        <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editNoteModal" onclick="fillEditModal('ETU001', 'Évaluation sur les réseaux', 15)">Modifier</button>
-                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteNoteModal" onclick="fillDeleteModal('ETU001')">Supprimer</button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>ETU002</td>
-                      <td>Évaluation sur le marketing</td>
-                      <td>18</td>
-                      <td>
-                        <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editNoteModal" onclick="fillEditModal('ETU002', 'Évaluation sur le marketing', 18)">Modifier</button>
-                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteNoteModal" onclick="fillDeleteModal('ETU002')">Supprimer</button>
-                      </td>
-                    </tr>
+                    <?php if (!empty($notes)): ?>
+                        <?php foreach ($notes as $note): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($note['matricule']) ?></td>
+                                <td><?= htmlspecialchars($note['evaluation_nom']) ?></td>
+                                <td><?= htmlspecialchars($note['note']) ?></td>
+                                <td>
+                                    <button class="btn btn-warning btn-sm editNoteBtn" 
+                                            data-id="<?= htmlspecialchars($note['note_id']) ?>"
+                                            data-note="<?= htmlspecialchars($note['note']) ?>"
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#editNoteModal">
+                                        Modifier
+                                    </button>
+                                    <button class="btn btn-danger btn-sm deleteNoteBtn"
+                                            onclick="if(confirm('Êtes-vous sûr de vouloir supprimer cette note ?')) {
+                                                document.getElementById('deleteNoteId').value='<?= htmlspecialchars($note['note_id']) ?>';
+                                                document.getElementById('deleteNoteForm').submit();
+                                            }">
+                                        Supprimer
+                                    </button>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="4" class="text-center">Aucune note trouvée</td>
+                        </tr>
+                    <?php endif; ?>
                   </tbody>
                 </table>
 
@@ -90,7 +127,8 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <form action="ajouter_note.php" method="POST">
+            <form action="NoteMainController" method="POST">
+              <input type="hidden" name="action" value="ajouter">
               <div class="mb-3">
                 <label for="matricule" class="form-label">Matricule</label>
                 <input type="text" class="form-control" name="matricule" required>
@@ -101,7 +139,7 @@
               </div>
               <div class="mb-3">
                 <label for="note" class="form-label">Note</label>
-                <input type="number" class="form-control" name="note" min="0" max="20" required>
+                <input type="number" class="form-control" name="note" min="0" max="20" step="0.25" required>
               </div>
               <button type="submit" class="btn btn-primary">Ajouter</button>
             </form>
@@ -119,15 +157,13 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <form action="modifier_note.php" method="POST">
-              <input type="hidden" id="editMatricule" name="matricule">
+            <form action="NoteMainController" method="POST">
+              <input type="hidden" name="action" value="modifier">
+              <input type="hidden" name="note_id" id="editNoteId">
               <div class="mb-3">
-                <label class="form-label">Évaluation</label>
-                <input type="text" id="editEvaluation" class="form-control" name="evaluation" required>
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Note</label>
-                <input type="number" id="editNote" class="form-control" name="note" min="0" max="20" required>
+                <label for="note" class="form-label">Note</label>
+                <input type="number" class="form-control" name="note" id="editNoteValue" 
+                       min="0" max="20" step="0.25" required>
               </div>
               <button type="submit" class="btn btn-warning">Modifier</button>
             </form>
@@ -136,35 +172,31 @@
       </div>
     </div>
 
-    <!-- Modal Supprimer une Note -->
-    <div class="modal fade" id="deleteNoteModal" tabindex="-1" aria-labelledby="deleteNoteModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="deleteNoteModalLabel">Supprimer la Note</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <p>Êtes-vous sûr de vouloir supprimer cette note ?</p>
-            <form action="supprimer_note.php" method="POST">
-              <input type="hidden" id="deleteMatricule" name="matricule">
-              <button type="submit" class="btn btn-danger">Supprimer</button>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- Formulaire de suppression caché -->
+    <form id="deleteNoteForm" action="NoteMainController" method="POST" style="display: none;">
+        <input type="hidden" name="action" value="supprimer">
+        <input type="hidden" name="note_id" id="deleteNoteId">
+    </form>
 
     <script>
-      function fillEditModal(matricule, evaluation, note) {
-        document.getElementById("editMatricule").value = matricule;
-        document.getElementById("editEvaluation").value = evaluation;
-        document.getElementById("editNote").value = note;
-      }
+      // Remplir le modal de modification
+      document.querySelectorAll('.editNoteBtn').forEach(button => {
+          button.addEventListener('click', function() {
+              document.getElementById('editNoteId').value = this.dataset.id;
+              document.getElementById('editNoteValue').value = this.dataset.note;
+          });
+      });
 
-      function fillDeleteModal(matricule) {
-        document.getElementById("deleteMatricule").value = matricule;
-      }
+      // Recherche par matricule
+      document.getElementById("searchMatricule").addEventListener("keyup", function() {
+          let input = this.value.toLowerCase();
+          let rows = document.querySelectorAll("#notesTableBody tr");
+
+          rows.forEach(row => {
+              let matricule = row.cells[0].textContent.toLowerCase();
+              row.style.display = matricule.includes(input) ? "" : "none";
+          });
+      });
     </script>
 
   </body>

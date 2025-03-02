@@ -1,18 +1,65 @@
 <?php
-require_once "UserRepository.php";
+require_once "DBRepository.php";
 
-class StudentRepository extends UserRepository {
+class StudentRepository extends DBRepository {
 
     // Récupérer tous les étudiants
     public function getAllStudents() {
-        $query = "SELECT * FROM etudiants";
-        return $this->fetchAll($query);
+        try {
+            $sql = "SELECT 
+                    u.user_id,
+                    u.nom,
+                    u.prenom,
+                    u.email,
+                    u.etat,
+                    e.matricule,
+                    e.tel,
+                    e.adresse
+                FROM users u
+                INNER JOIN etudiants e ON u.user_id = e.user_id
+                WHERE u.etat = 1 
+                AND u.role = 'Etudiant'
+                ORDER BY u.nom, u.prenom";
+
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+            
+            // Débogage
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            error_log("Nombre d'étudiants trouvés : " . count($result));
+            return $result;
+            
+        } catch (PDOException $e) {
+            error_log("Erreur dans getAllStudents: " . $e->getMessage());
+            throw $e;
+        }
     }
 
     // Récupérer un étudiant par son ID
     public function getStudentById($id) {
-        $query = "SELECT * FROM etudiants WHERE etudiant_id = ?";
-        return $this->fetchOne($query, [$id]);
+        try {
+            $sql = "SELECT 
+                    u.user_id,
+                    u.nom,
+                    u.prenom,
+                    u.email,
+                    u.etat,
+                    e.matricule,
+                    e.tel,
+                    e.adresse
+                FROM users u
+                INNER JOIN etudiants e ON u.user_id = e.user_id
+                WHERE u.user_id = :id 
+                AND u.etat = 1
+                AND u.role = 'Etudiant'";
+            
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['id' => $id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Erreur lors de la récupération de l'étudiant: " . $e->getMessage());
+            throw $e;
+        }
     }
 
     // Ajouter un étudiant
@@ -53,6 +100,38 @@ class StudentRepository extends UserRepository {
     public function deactivateStudent($id) {
         $query = "UPDATE etudiants SET active = 0 WHERE etudiant_id = ?";
         return $this->execute($query, [$id]);
+    }
+
+    public function getByMatricule($matricule) {
+        try {
+            $sql = "SELECT e.*, u.nom, u.prenom 
+                    FROM etudiants e 
+                    JOIN users u ON e.user_id = u.user_id 
+                    WHERE e.matricule = :matricule AND u.etat = 1";
+            
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['matricule' => $matricule]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Erreur lors de la recherche de l'étudiant: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    public function getById($id) {
+        try {
+            $sql = "SELECT e.*, u.nom, u.prenom 
+                    FROM etudiants e 
+                    JOIN users u ON e.user_id = u.user_id 
+                    WHERE e.id = :id AND u.etat = 1";
+            
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['id' => $id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Erreur lors de la récupération de l'étudiant: " . $e->getMessage());
+            throw $e;
+        }
     }
 }
 ?>
