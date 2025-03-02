@@ -15,7 +15,7 @@
             <h5>Gérer les étudiants</h5>
           </div>
           <div class="card-footer d-flex justify-content-between align-items-center">
-            <a class="small text-white stretched-link" href="gestion_etudiants.php">Accéder</a>
+            <a class="small text-white stretched-link" href="listeEtudiants">Accéder</a>
             <i class="fas fa-angle-right"></i>
           </div>
         </div>
@@ -27,7 +27,7 @@
             <h5>Gérer les notes</h5>
           </div>
           <div class="card-footer d-flex justify-content-between align-items-center">
-            <a class="small text-white stretched-link" href="#">Accéder</a>
+            <a class="small text-white stretched-link" href="listeNotes">Accéder</a>
             <i class="fas fa-angle-right"></i>
           </div>
         </div>
@@ -39,7 +39,7 @@
             <h5>Gérer les évaluations</h5>
           </div>
           <div class="card-footer d-flex justify-content-between align-items-center">
-            <a class="small text-white stretched-link" href="#">Accéder</a>
+            <a class="small text-white stretched-link" href="listeEvaluations">Accéder</a>
             <i class="fas fa-angle-right"></i>
           </div>
         </div>
@@ -48,10 +48,10 @@
         <div class="card bg-danger text-white shadow-sm animate-hover h-100">
           <div class="card-body d-flex flex-column align-items-center justify-content-center text-center">
             <i class="fas fa-user-shield fa-2x mb-2"></i>
-            <h5>Gestion des administrateurs</h5>
+            <h5>Gestion des utilisateurs</h5>
           </div>
           <div class="card-footer d-flex justify-content-between align-items-center">
-            <a class="small text-white stretched-link" href="#">Accéder</a>
+            <a class="small text-white stretched-link" href="gestionUtilisateurs">Accéder</a>
             <i class="fas fa-angle-right"></i>
           </div>
         </div>

@@ -42,7 +42,7 @@
           </div>
           <span class="menu-item">Gestion des utilisateurs</span>
         </a>
-        <a class="nav-link" href="changer_mot_de_passe.html">
+        <a class="nav-link" href="gestionMDP">
           <div class="sb-nav-link-icon">
             <i class="fas fa-lock"></i>
           </div>

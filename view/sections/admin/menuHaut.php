@@ -1,3 +1,14 @@
+<?php
+// Déconnexion (si l'utilisateur est connecté)
+if (isset($_GET['logout'])) {
+    session_start();
+    session_unset();  // Supprime toutes les variables de session
+    session_destroy(); // Détruit la session
+    header("Location: login"); // Redirige l'utilisateur vers la page de connexion
+    exit();
+}
+?>
+
 <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
   <!-- Navbar Brand (Logo)-->
   <a class="navbar-brand ps-3" href="index.html">StudentX Admin</a>
@@ -12,10 +23,7 @@
         <i class="fas fa-user fa-fw"></i>
       </a>
       <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-        <li><a class="dropdown-item" href="#!">Paramètres</a></li>
-        <li><a class="dropdown-item" href="#!">Journal d'activité</a></li>
-        <li><hr class="dropdown-divider" /></li>
-        <li><a class="dropdown-item" href="#!">Se déconnecter</a></li>
+        <li><a class="dropdown-item" href="?logout=true">Se déconnecter</a></li>
       </ul>
     </li>
   </ul>

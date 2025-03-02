@@ -1,20 +1,27 @@
 RewriteEngine On
 
-#----------- Route globales -----------
-RewriteRule ^login$ login.php
-RewriteRule ^admin$ admin.php
-RewriteRule ^home$ index.php
+#----------- Route globales ----------- 
+RewriteRule ^login$ login.php 
+RewriteRule ^admin$ admin.php 
+RewriteRule ^home$ index.php 
 
+#----------- Route View ----------- 
+RewriteRule ^listeEtudiants$ view/pages/admin/listeEtudiants/liste.php 
+RewriteRule ^listeEvaluations$ view/pages/admin/listeEvaluations/liste.php 
+RewriteRule ^listeNotes$ view/pages/admin/listeNotes/liste.php 
+RewriteRule ^gestionUtilisateurs$ view/pages/admin/gestionUtilisateurs/liste.php 
+RewriteRule ^gestionMDP$ view/pages/admin/gestionMDP/liste.php 
 
-#----------- Route View -----------
-RewriteRule ^listeEtudiants$ view/pages/admin/listeEtudiants/liste.php
-RewriteRule ^listeEvaluations$ view/pages/admin/listeEvaluations/liste.php
-RewriteRule ^listeNotes$ view/pages/admin/listeNotes/liste.php
-RewriteRule ^gestionUtilisateurs$ view/pages/admin/gestionUtilisateurs/liste.php
+#----------- Route Controller ----------- 
+RewriteRule ^UserMainController$ controller/user/UserMainController.php [L]
+RewriteRule ^EtudiantMainController$ controller/etudiant/StudentMainController.php 
+RewriteRule ^NoteMainController$ controller/note/NoteMainController.php 
 
+#----------- Route Model ----------- 
+RewriteRule ^UserRepository$ model/UserRepository.php 
+RewriteRule ^NoteRepository$ model/NoteRepository.php 
+RewriteRule ^StudentRepository$ model/StudentRepository.php
 
-#----------- Route Controller -----------
-RewriteRule ^userMainController$  controller/user/UserMainController.php
-
-#----------- Route Model -----------
-RewriteRule ^UserRepository$  model/UserRepository.php
+# ------------ Gestion des actions ---------------- 
+RewriteCond %{QUERY_STRING} (^|&)action=([^&]+)(&|$) 
+RewriteRule ^UserMainController$ controller/user/UserMainController.php [QSA,L] 

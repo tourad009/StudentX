@@ -15,7 +15,7 @@
         <!-- Section Content -->
         <main>
           <div class="container-fluid px-4">
-            <h1 class="mt-4">Liste des évaluations</h1>
+            <h1 class="mt-4">Gestion des évaluations</h1>
             <ol class="breadcrumb mb-4">
               <li class="breadcrumb-item active">Gestion des évaluations</li>
             </ol>
